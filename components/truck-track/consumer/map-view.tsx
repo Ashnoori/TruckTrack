@@ -119,19 +119,22 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
               className={`absolute ${markerPositions[truck.id]} z-10 flex flex-col items-center gap-1`}
               aria-label={truck.name}
             >
-              <div className="relative flex items-start gap-0">
+              <div className="relative flex items-start">
+                {/* Pin box - always fire orange */}
                 <div className="flex h-11 w-11 items-center justify-center border border-fire-orange bg-fire-orange text-app-black shadow-[0_8px_20px_rgba(0,0,0,0.28)]">
                   <span className="text-lg leading-none">🚚</span>
                 </div>
+                {/* Name box - adjacent to the right */}
                 <div
-                  className={`mt-1 max-w-[122px] truncate border px-3 py-2 text-left font-mono text-[10px] uppercase tracking-[0.1em] ${
+                  className={`h-11 flex items-center border px-3 text-left font-mono text-[10px] uppercase tracking-[0.1em] ${
                     isSelected
                       ? "border-fire-orange bg-fire-orange text-app-black"
                       : "border-border-dark bg-charcoal text-warm-cream"
                   }`}
                 >
-                  {truck.name}
+                  <span className="truncate max-w-[100px]">{truck.name}</span>
                 </div>
+                {/* Pin pointer */}
                 <div className="absolute left-[18px] top-[42px] flex flex-col items-center">
                   <div className="h-2 w-px bg-fire-orange" />
                   <div className="h-2 w-2 rotate-45 border-r border-b border-fire-orange bg-fire-orange" />
