@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowUpRight, Clock, MapPin, Navigation, User, Users, X } from "lucide-react"
+import { ArrowUpRight, Clock, MapPin, Navigation, User, Users, X, Compass } from "lucide-react"
 import { BottomSheet } from "../bottom-sheet"
 import { TruckCard, TruckCardSkeleton, type Truck } from "../truck-card"
 import { StatusBadge } from "../status-badge"
