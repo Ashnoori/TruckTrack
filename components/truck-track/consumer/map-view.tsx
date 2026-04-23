@@ -256,15 +256,23 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleOpenTruckProfile(selectedTruck)}
-                className="flex min-w-[78px] items-center justify-center gap-1 border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
-              >
-                {profileLabel}
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleOpenTruckProfile(selectedTruck)}
+                  className="flex h-10 items-center justify-center gap-1 border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
+                >
+                  {detailsLabel}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  className="flex h-10 items-center justify-center gap-1 border border-border-dark bg-charcoal px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-warm-cream transition-colors hover:bg-graphite"
+                >
+                  <Compass className="h-4 w-4" />
+                  {directionsLabel}
+                </button>
+              </div>
                 </>
               )
             })()}
