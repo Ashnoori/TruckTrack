@@ -60,7 +60,8 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
   const closeLabel = locale === "fr" ? "Fermer le résumé" : "Close summary"
   const summaryLabel = locale === "fr" ? "APERÇU DU CAMION" : "TRUCK SUMMARY"
   const followersLabel = locale === "fr" ? "ABONNÉS" : "FOLLOWERS"
-  const profileLabel = locale === "fr" ? "PROFIL" : "PROFILE"
+  const detailsLabel = locale === "fr" ? "DÉTAILS" : "DETAILS"
+  const directionsLabel = locale === "fr" ? "ITINÉRAIRE" : "DIRECTIONS"
 
   const truckStats: Record<string, { followers: string; imageUrl?: string }> = {
     "1": { followers: "1.2K", imageUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=320&q=80" },
