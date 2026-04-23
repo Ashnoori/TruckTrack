@@ -273,9 +273,9 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
                   {directionsLabel}
                 </button>
               </div>
-                </>
-              )
-            })()}
+            </>
+          )
+        })()}
           </div>
         ) : (
           <>
