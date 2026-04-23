@@ -269,13 +269,14 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
                   type="button"
                   className="flex h-10 items-center justify-center gap-1 border border-border-dark bg-charcoal px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-warm-cream transition-colors hover:bg-graphite"
                 >
-                  <Compass className="h-4 w-4" />
+                <Compass className="h-4 w-4" />
                   {directionsLabel}
                 </button>
               </div>
-            </>
-          )
-        })()}
+            </div>
+                </>
+              )
+            })()}
           </div>
         ) : (
           <>
