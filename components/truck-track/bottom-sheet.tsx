@@ -7,13 +7,14 @@ interface BottomSheetProps {
   isOpen: boolean
   onClose?: () => void
   children: React.ReactNode
-  snapPoints?: ("peek" | "half" | "full")[]
-  initialSnap?: "peek" | "half" | "full"
+  snapPoints?: ("peek" | "quarter" | "half" | "full")[]
+  initialSnap?: "peek" | "quarter" | "half" | "full"
   className?: string
 }
 
 const snapHeights = {
   peek: "h-[200px]",
+  quarter: "h-[25vh]",
   half: "h-[50vh]",
   full: "h-[85vh]",
 }

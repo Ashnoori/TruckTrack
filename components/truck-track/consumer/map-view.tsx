@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Navigation, User } from "lucide-react"
+import { Clock, MapPin, Navigation, User, X } from "lucide-react"
 import { BottomSheet } from "../bottom-sheet"
 import { TruckCard, TruckCardSkeleton, type Truck } from "../truck-card"
 import { StatusBadge } from "../status-badge"
@@ -54,10 +54,34 @@ const mockTrucks: Truck[] = [
 export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapViewProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(true)
+  const [selectedTruck, setSelectedTruck] = useState<Truck | null>(null)
   const nearbyLabel = locale === "fr" ? "CAMIONS À PROXIMITÉ" : "NEARBY TRUCKS"
   const openNowLabel = locale === "fr" ? "OUVERTS MAINTENANT" : "OPEN NOW"
+  const closeLabel = locale === "fr" ? "Fermer le résumé" : "Close summary"
+  const summaryLabel = locale === "fr" ? "APERÇU DU CAMION" : "TRUCK SUMMARY"
+  const tapForDetailsLabel = locale === "fr" ? "Touchez pour voir la fiche" : "Tap for full profile"
 
   const openTrucks = mockTrucks.filter(t => t.isOpen)
+
+  const markerPositions: Record<string, string> = {
+    "1": "top-[32%] left-1/2 -translate-x-1/2 -translate-y-1/2",
+    "2": "top-[48%] left-[30%] -translate-x-1/2 -translate-y-1/2",
+    "3": "top-[64%] right-[24%] translate-x-1/2 -translate-y-1/2",
+    "4": "top-[26%] right-[18%] translate-x-1/2 -translate-y-1/2",
+  }
+
+  const handleMarkerSelect = (truck: Truck) => {
+    setSelectedTruck(truck)
+    setSheetOpen(true)
+  }
+
+  const handleCloseSummary = () => {
+    setSelectedTruck(null)
+  }
+
+  const handleOpenTruckProfile = (truck: Truck) => {
+    onTruckSelect?.(truck)
+  }
 
   return (
     <div className="relative h-full w-full bg-app-black">
@@ -76,30 +100,58 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
         />
         
         {/* Mock truck markers */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="relative">
-            <div className="w-10 h-10 bg-fire-orange flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-warm-cream" />
-            </div>
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-fire-orange" />
-          </div>
-        </div>
-        
-        <div className="absolute top-1/2 left-1/3">
-          <div className="relative">
-            <div className="w-8 h-8 bg-fire-orange/80 flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-warm-cream" />
-            </div>
-          </div>
-        </div>
-        
-        <div className="absolute top-2/3 right-1/3">
-          <div className="relative">
-            <div className="w-8 h-8 bg-muted-text flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-warm-cream" />
-            </div>
-          </div>
-        </div>
+        {mockTrucks.map((truck) => {
+          const isSelected = selectedTruck?.id === truck.id
+
+          return (
+            <button
+              key={truck.id}
+              type="button"
+              onClick={() => handleMarkerSelect(truck)}
+              className={`absolute ${markerPositions[truck.id]} z-10 flex flex-col items-center gap-1`}
+              aria-label={truck.name}
+            >
+              <div
+                className={`max-w-[110px] truncate border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] ${
+                  isSelected
+                    ? "border-fire-orange bg-fire-orange text-app-black"
+                    : truck.isOpen
+                      ? "border-border-dark bg-charcoal text-warm-cream"
+                      : "border-border-dark bg-graphite text-muted-text"
+                }`}
+              >
+                {truck.name}
+              </div>
+              <div className="relative flex flex-col items-center">
+                <div
+                  className={`flex h-11 w-11 items-center justify-center border ${
+                    isSelected
+                      ? "border-fire-orange bg-fire-orange text-app-black"
+                      : truck.isOpen
+                        ? "border-border-dark bg-charcoal text-fire-orange"
+                        : "border-border-dark bg-graphite text-muted-text"
+                  }`}
+                >
+                  <span className="text-lg leading-none">🚚</span>
+                </div>
+                <div
+                  className={`h-2 w-px ${
+                    isSelected ? "bg-fire-orange" : truck.isOpen ? "bg-border-dark" : "bg-muted-text"
+                  }`}
+                />
+                <div
+                  className={`h-2 w-2 rotate-45 border-r border-b ${
+                    isSelected
+                      ? "border-fire-orange bg-fire-orange"
+                      : truck.isOpen
+                        ? "border-border-dark bg-charcoal"
+                        : "border-border-dark bg-graphite"
+                  }`}
+                />
+              </div>
+            </button>
+          )
+        })}
 
         {/* User location */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -133,34 +185,99 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
       {/* Bottom sheet with nearby trucks */}
       <BottomSheet 
         isOpen={sheetOpen} 
-        snapPoints={["peek", "half", "full"]}
-        initialSnap="half"
+        snapPoints={selectedTruck ? ["quarter", "half"] : ["peek", "half", "full"]}
+        initialSnap={selectedTruck ? "quarter" : "half"}
       >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-xl text-warm-cream">{nearbyLabel}</h2>
-          <StatusBadge variant="accent">
-            {openTrucks.length} {openNowLabel}
-          </StatusBadge>
-        </div>
-        
-        <div className="flex flex-col gap-3">
-          {isLoading ? (
-            <>
-              <TruckCardSkeleton />
-              <TruckCardSkeleton />
-              <TruckCardSkeleton />
-            </>
-          ) : (
-            mockTrucks.map((truck) => (
-              <TruckCard
-                key={truck.id}
-                truck={truck}
-                locale={locale}
-                onClick={() => onTruckSelect?.(truck)}
-              />
-            ))
-          )}
-        </div>
+        {selectedTruck ? (
+          <div className="flex h-full flex-col">
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-text">
+                  {summaryLabel}
+                </p>
+                <h2 className="font-display text-2xl text-warm-cream">{selectedTruck.name}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseSummary}
+                aria-label={closeLabel}
+                className="flex h-9 w-9 items-center justify-center border border-border-dark bg-graphite text-warm-cream transition-colors hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mb-3 flex items-center gap-2">
+              <StatusBadge variant={selectedTruck.isOpen ? "open" : "closed"}>
+                {selectedTruck.isOpen ? (locale === "fr" ? "OUVERT" : "OPEN NOW") : (locale === "fr" ? "FERMÉ" : "CLOSED")}
+              </StatusBadge>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-fire-orange">
+                {selectedTruck.distance}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-[1fr_auto] gap-3 border border-border-dark bg-graphite p-3">
+              <div className="min-w-0 space-y-2">
+                <div className="flex items-center gap-2 text-sm text-muted-text">
+                  <MapPin className="h-4 w-4 shrink-0 text-fire-orange" />
+                  <span className="truncate">{selectedTruck.location}</span>
+                </div>
+                {selectedTruck.todayHours && (
+                  <div className="flex items-center gap-2 text-sm text-muted-text">
+                    <Clock className="h-4 w-4 shrink-0 text-fire-orange" />
+                    <span>{selectedTruck.todayHours}</span>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {selectedTruck.cuisine.slice(0, 2).map((tag) => (
+                    <span
+                      key={tag}
+                      className="border border-border-dark px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-text"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleOpenTruckProfile(selectedTruck)}
+                className="flex min-w-[84px] items-center justify-center border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
+              >
+                {tapForDetailsLabel}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-xl text-warm-cream">{nearbyLabel}</h2>
+              <StatusBadge variant="accent">
+                {openTrucks.length} {openNowLabel}
+              </StatusBadge>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              {isLoading ? (
+                <>
+                  <TruckCardSkeleton />
+                  <TruckCardSkeleton />
+                  <TruckCardSkeleton />
+                </>
+              ) : (
+                mockTrucks.map((truck) => (
+                  <TruckCard
+                    key={truck.id}
+                    truck={truck}
+                    locale={locale}
+                    onClick={() => handleOpenTruckProfile(truck)}
+                  />
+                ))
+              )}
+            </div>
+          </>
+        )}
       </BottomSheet>
     </div>
   )
