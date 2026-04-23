@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowUpRight, Clock, MapPin, Navigation, User, Users, X } from "lucide-react"
+import { ArrowUpRight, Clock, MapPin, Navigation, User, Users, X, Compass } from "lucide-react"
 import { BottomSheet } from "../bottom-sheet"
 import { TruckCard, TruckCardSkeleton, type Truck } from "../truck-card"
 import { StatusBadge } from "../status-badge"
@@ -60,7 +60,8 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
   const closeLabel = locale === "fr" ? "Fermer le résumé" : "Close summary"
   const summaryLabel = locale === "fr" ? "APERÇU DU CAMION" : "TRUCK SUMMARY"
   const followersLabel = locale === "fr" ? "ABONNÉS" : "FOLLOWERS"
-  const profileLabel = locale === "fr" ? "PROFIL" : "PROFILE"
+  const detailsLabel = locale === "fr" ? "DÉTAILS" : "DETAILS"
+  const directionsLabel = locale === "fr" ? "ITINÉRAIRE" : "DIRECTIONS"
 
   const truckStats: Record<string, { followers: string; imageUrl?: string }> = {
     "1": { followers: "1.2K", imageUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=320&q=80" },
@@ -119,19 +120,22 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
               className={`absolute ${markerPositions[truck.id]} z-10 flex flex-col items-center gap-1`}
               aria-label={truck.name}
             >
-              <div className="relative flex items-start gap-0">
+              <div className="relative flex items-start">
+                {/* Pin box - always fire orange */}
                 <div className="flex h-11 w-11 items-center justify-center border border-fire-orange bg-fire-orange text-app-black shadow-[0_8px_20px_rgba(0,0,0,0.28)]">
                   <span className="text-lg leading-none">🚚</span>
                 </div>
+                {/* Name box - adjacent to the right */}
                 <div
-                  className={`mt-1 max-w-[122px] truncate border px-3 py-2 text-left font-mono text-[10px] uppercase tracking-[0.1em] ${
+                  className={`h-11 flex items-center border px-3 text-left font-mono text-[10px] uppercase tracking-[0.1em] ${
                     isSelected
                       ? "border-fire-orange bg-fire-orange text-app-black"
                       : "border-border-dark bg-charcoal text-warm-cream"
                   }`}
                 >
-                  {truck.name}
+                  <span className="truncate max-w-[100px]">{truck.name}</span>
                 </div>
+                {/* Pin pointer */}
                 <div className="absolute left-[18px] top-[42px] flex flex-col items-center">
                   <div className="h-2 w-px bg-fire-orange" />
                   <div className="h-2 w-2 rotate-45 border-r border-b border-fire-orange bg-fire-orange" />
@@ -252,14 +256,23 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleOpenTruckProfile(selectedTruck)}
-                className="flex min-w-[78px] items-center justify-center gap-1 border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
-              >
-                {profileLabel}
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleOpenTruckProfile(selectedTruck)}
+                  className="flex h-10 items-center justify-center gap-1 border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
+                >
+                  {detailsLabel}
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  className="flex h-10 items-center justify-center gap-1 border border-border-dark bg-charcoal px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-warm-cream transition-colors hover:bg-graphite"
+                >
+                <Compass className="h-4 w-4" />
+                  {directionsLabel}
+                </button>
+              </div>
             </div>
                 </>
               )
