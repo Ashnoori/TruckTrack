@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Clock, MapPin, Navigation, User, X } from "lucide-react"
+import { ArrowUpRight, Clock, MapPin, Navigation, User, Users, X } from "lucide-react"
 import { BottomSheet } from "../bottom-sheet"
 import { TruckCard, TruckCardSkeleton, type Truck } from "../truck-card"
 import { StatusBadge } from "../status-badge"
@@ -59,7 +59,15 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
   const openNowLabel = locale === "fr" ? "OUVERTS MAINTENANT" : "OPEN NOW"
   const closeLabel = locale === "fr" ? "Fermer le résumé" : "Close summary"
   const summaryLabel = locale === "fr" ? "APERÇU DU CAMION" : "TRUCK SUMMARY"
-  const tapForDetailsLabel = locale === "fr" ? "Touchez pour voir la fiche" : "Tap for full profile"
+  const followersLabel = locale === "fr" ? "ABONNÉS" : "FOLLOWERS"
+  const profileLabel = locale === "fr" ? "PROFIL" : "PROFILE"
+
+  const truckStats: Record<string, { followers: string; imageUrl?: string }> = {
+    "1": { followers: "1.2K", imageUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=320&q=80" },
+    "2": { followers: "864", imageUrl: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?w=320&q=80" },
+    "3": { followers: "2.8K", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=320&q=80" },
+    "4": { followers: "947", imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=320&q=80" },
+  }
 
   const openTrucks = mockTrucks.filter(t => t.isOpen)
 
@@ -111,43 +119,23 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
               className={`absolute ${markerPositions[truck.id]} z-10 flex flex-col items-center gap-1`}
               aria-label={truck.name}
             >
-              <div
-                className={`max-w-[110px] truncate border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] ${
-                  isSelected
-                    ? "border-fire-orange bg-fire-orange text-app-black"
-                    : truck.isOpen
-                      ? "border-border-dark bg-charcoal text-warm-cream"
-                      : "border-border-dark bg-graphite text-muted-text"
-                }`}
-              >
-                {truck.name}
-              </div>
-              <div className="relative flex flex-col items-center">
-                <div
-                  className={`flex h-11 w-11 items-center justify-center border ${
-                    isSelected
-                      ? "border-fire-orange bg-fire-orange text-app-black"
-                      : truck.isOpen
-                        ? "border-border-dark bg-charcoal text-fire-orange"
-                        : "border-border-dark bg-graphite text-muted-text"
-                  }`}
-                >
+              <div className="relative flex items-start gap-0">
+                <div className="flex h-11 w-11 items-center justify-center border border-fire-orange bg-fire-orange text-app-black shadow-[0_8px_20px_rgba(0,0,0,0.28)]">
                   <span className="text-lg leading-none">🚚</span>
                 </div>
                 <div
-                  className={`h-2 w-px ${
-                    isSelected ? "bg-fire-orange" : truck.isOpen ? "bg-border-dark" : "bg-muted-text"
-                  }`}
-                />
-                <div
-                  className={`h-2 w-2 rotate-45 border-r border-b ${
+                  className={`mt-1 max-w-[122px] truncate border px-3 py-2 text-left font-mono text-[10px] uppercase tracking-[0.1em] ${
                     isSelected
-                      ? "border-fire-orange bg-fire-orange"
-                      : truck.isOpen
-                        ? "border-border-dark bg-charcoal"
-                        : "border-border-dark bg-graphite"
+                      ? "border-fire-orange bg-fire-orange text-app-black"
+                      : "border-border-dark bg-charcoal text-warm-cream"
                   }`}
-                />
+                >
+                  {truck.name}
+                </div>
+                <div className="absolute left-[18px] top-[42px] flex flex-col items-center">
+                  <div className="h-2 w-px bg-fire-orange" />
+                  <div className="h-2 w-2 rotate-45 border-r border-b border-fire-orange bg-fire-orange" />
+                </div>
               </div>
             </button>
           )
@@ -190,6 +178,11 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
       >
         {selectedTruck ? (
           <div className="flex h-full flex-col">
+            {(() => {
+              const truckMeta = truckStats[selectedTruck.id]
+
+              return (
+                <>
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-text">
@@ -216,7 +209,21 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
               </span>
             </div>
 
-            <div className="grid grid-cols-[1fr_auto] gap-3 border border-border-dark bg-graphite p-3">
+            <div className="grid grid-cols-[68px_1fr_auto] gap-3 border border-border-dark bg-graphite p-3">
+              <div className="h-[68px] w-[68px] overflow-hidden border border-border-dark bg-charcoal">
+                {truckMeta?.imageUrl ? (
+                  <img
+                    src={truckMeta.imageUrl}
+                    alt={selectedTruck.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-fire-orange">
+                    <span className="text-2xl leading-none">🚚</span>
+                  </div>
+                )}
+              </div>
+
               <div className="min-w-0 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-muted-text">
                   <MapPin className="h-4 w-4 shrink-0 text-fire-orange" />
@@ -238,16 +245,25 @@ export function MapView({ locale = "en", onTruckSelect, onProfileClick }: MapVie
                     </span>
                   ))}
                 </div>
+                <div className="flex items-center gap-2 pt-1 text-sm text-warm-cream">
+                  <Users className="h-4 w-4 shrink-0 text-fire-orange" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-text">{followersLabel}</span>
+                  <span className="font-display text-lg leading-none text-warm-cream">{truckMeta?.followers ?? "—"}</span>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => handleOpenTruckProfile(selectedTruck)}
-                className="flex min-w-[84px] items-center justify-center border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
+                className="flex min-w-[78px] items-center justify-center gap-1 border border-fire-orange bg-fire-orange px-3 text-center font-mono text-[10px] uppercase tracking-[0.1em] text-app-black transition-colors hover:bg-fire-orange-hover"
               >
-                {tapForDetailsLabel}
+                {profileLabel}
+                <ArrowUpRight className="h-3.5 w-3.5" />
               </button>
             </div>
+                </>
+              )
+            })()}
           </div>
         ) : (
           <>
